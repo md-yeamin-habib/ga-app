@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ========================== -->
+    <!-- SPRING BOOT PARENT -->
+    <!-- ========================== -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.gaapp</groupId>
+    <artifactId>ga-app</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>ga-app</name>
+
+    <!-- ========================== -->
+    <!-- JAVA VERSION -->
+    <!-- ========================== -->
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+    <!-- ========================== -->
+    <!-- DEPENDENCIES -->
+    <!-- ========================== -->
+    <dependencies>
+
+        <!-- Spring Boot Web (REQUIRED for serving UI + APIs) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+
+        <!-- Optional: Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ========================== -->
+    <!-- BUILD -->
+    <!-- ========================== -->
+    <build>
+        <finalName>ga-app</finalName>
+        <plugins>
+
+            <!-- Spring Boot Plugin (CRITICAL) -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
