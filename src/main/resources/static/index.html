@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GeneticAlgorithm.Lite</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- TOP RIBBON -->
+<div class="ribbon">
+  <button id="import-btn">Load</button>
+  <button id="generate-btn">Generate</button>
+  <button id="param-btn">Parameters</button>
+  <button id="run-btn">Evaluate</button>
+  <button id="export-btn">Save</button>
+  <button id="clear-btn">Clear</button>
+</div>
+
+<!-- FILTER ROW -->
+<div class="filter-row">
+  <button id="filter-btn">Filter</button>
+  <input type="text" id="filter-display" placeholder="Select filter..." readonly>
+  <button id="apply-btn">Apply</button>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+
+  <!-- TABLE AREA -->
+  <div class="table-area">
+
+    <div class="top-bar-container">
+
+      <div class="top-bar" id="top-bar">
+
+        <div class="gen-control">
+          <label>Showing Generation:</label>
+
+          <div class="input-wrapper">
+            <input type="text" id="generation-select" autocomplete="off"/>
+            <div id="generation-dropdown" class="dropdown-list"></div>
+          </div>
+
+          <div class="gen-nav">
+            <button id="to-next-gen" title="Next Generation">▶</button>
+            <button id="to-last-gen" title="Last Generation">▶▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div id="tabs" class="tabs"></div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <table id="main-table">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <div class="panel">
+      <div class="panel-title">Summary</div>
+
+      <div class="summary-row">
+        <span>Generation</span>
+        <strong id="sum-gen">-</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Best Fitness</span>
+        <strong id="sum-best">-</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Average Fitness</span>
+        <strong id="sum-avg">-</strong>
+      </div>
+
+      <div class="summary-row">
+        <span>Best Individual</span>
+        <strong id="sum-ind">-</strong>
+      </div>
+
+      <div class="summary-divider"></div>
+
+      <div class="summary-row">
+        <span>Trend</span>
+        <strong id="sum-trend">-</strong>
+      </div>
+
+      <div class="summary-row" id="stop-row" style="display:none;">
+        <span>Stop Reason</span>
+        <strong id="sum-stop">-</strong>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Plots</div>
+      <div class="plot-viewer" id="plot-viewer">
+
+        <!-- MAIN IMAGE -->
+        <div class="plot-main-wrapper">
+
+          <div class="plot-nav left" id="plot-prev">&lt;</div>
+
+          <div class="plot-main" id="plot-main"></div>
+
+          <div class="plot-nav right" id="plot-next">&gt;</div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- FILTER POPUP -->
+<div class="popup" id="filter-popup">
+  <div class="popup-content">
+    <div class="popup-header">Select Filter</div>
+
+    <ul class="tree">
+      <li class="node">Filters
+        <ul class="nested">
+          <li class="node">Generic
+            <ul class="nested">
+              <li class="node">Binary
+                <ul class="nested">
+                  <li class="leaf">Ones</li>
+                  <li class="leaf">BinaryEvaluation</li>
+                </ul>
+              </li>
+              <li class="node">Integer
+                <ul class="nested">
+                  <li class="leaf">Sum</li>
+                  <li class="leaf">Custom</li>
+                </ul>
+              </li>
+              <li class="node">Real
+                <ul class="nested">
+                  <li class="leaf">Sum</li>
+                  <li class="leaf">Custom</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="leaf">Knapsack</li>
+          <li class="leaf">TSP</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- CUSTOM FORMULA POPUP -->
+<div class="popup" id="custom-popup">
+  <div class="popup-content">
+    <label>Enter the formula</label>
+    <input type="text" id="custom-input" placeholder="e.g. x0 + x1^2">
+
+    <div class="popup-actions">
+      <button id="custom-apply">Apply</button>
+      <button id="custom-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARAMETER MODAL -->
+<div class="modal" id="param-modal">
+  <div class="modal-content">
+
+    <div class="tabs">
+      <button class="tab active">Basic</button>
+      <button class="tab">Operators</button>
+      <button class="tab">Advanced</button>
+    </div>
+
+    <div class="tab-content">
+
+      <!-- BASIC -->
+      <div class="tab-pane active" id="basic-tab">
+        <div class="form-grid">
+
+          <div class="row">
+            <label>Population Size</label>
+            <input type="number" id="pop-size" min="2" max="100" value="10">
+          </div>
+
+          <div class="row">
+            <label id="length-label">Chromosome Length</label>
+            <input type="number" id="length-input" min="4" max="32" value="5">
+          </div>
+
+          <div id="gene-range-group" class="vertical-group">
+            <div class="row">
+              <label>Minimum Gene Value</label>
+              <input type="number" id="min-gene" value="0">
+            </div>
+            <div class="row">
+              <label>Maximum Gene Value</label>
+              <input type="number" id="max-gene" value="9">
+            </div>
+          </div>
+
+          <div id="coord-group" class="hidden vertical-group">
+            <div class="row">
+              <label>Minimum Coordinate</label>
+              <input type="number" id="min-coord" value="0.0">
+            </div>
+            <div class="row">
+              <label>Maximum Coordinate</label>
+              <input type="number" id="max-coord" value="9.0">
+            </div>
+          </div>
+
+          <div id="knapsack-group" class="hidden vertical-group">
+            <div class="row">
+              <label>Minimum Weight</label>
+              <input type="number" id="min-weight" value="1.0" min="1.0">
+            </div>
+            <div class="row">
+              <label>Maximum Weight</label>
+              <input type="number" id="max-weight" value="9.0" min="1.0">
+            </div>
+            <div class="row">
+              <label>Minimum Value</label>
+              <input type="number" id="min-value" value="1.0" min="1.0">
+            </div>
+            <div class="row">
+              <label>Maximum Value</label>
+              <input type="number" id="max-value" value="9.0" min="1.0">
+            </div>
+            <div class="row">
+              <label>Capacity</label>
+              <input type="number" id="capacity" value="15.0" min="1.0">
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- OPERATORS -->
+      <div class="tab-pane" id="operation-tab">
+        <div class="form-grid">
+
+          <div class="row">
+            <label>Selection</label>
+            <select id="select-mode">
+              <option value="Tournament">Tournament</option>
+              <option value="Roulette">Roulette</option>
+              <option value="Rank">Rank</option>
+              <option value="Direct_Pick" selected>Direct Pick</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Tournament Size</label>
+            <input type="number" id="tournament-size" value="3" min="1" disabled>
+          </div>
+
+          <div class="row">
+            <label>Crossover</label>
+            <select id="crossover-mode">
+              <option value="One_Point" selected>One Point</option>
+              <option value="Two_Point">Two Point</option>
+              <option value="Order">Ordered (OX)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Crossover Rate</label>
+            <input type="number" id="crossover-rate" value="0.8" min="0" max="1" step="0.01">
+          </div>
+
+          <div class="row">
+            <label>Crossover Indices</label>
+            <input type="text" id="crossover-indices" value="random">
+          </div>
+
+          <div class="row">
+            <label>Mutation</label>
+            <select id="mutation-mode">
+              <option value="Bit_Flip">Bit Flip</option>
+              <option value="Random_Reset">Reset</option>
+              <option value="Swap" selected>Swapping</option>
+              <option value="Scramble">Scramble</option>
+              <option value="Inversion">Inversion</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Mutation Rate</label>
+            <input type="number" id="mutation-rate" value="0.1" min="0" max="1" step="0.01">
+          </div>
+
+          <div class="row">
+            <label>Mutation Indices</label>
+            <input type="text" id="mutation-indices" value="random">
+          </div>
+
+          <div class="row">
+            <label>Replacement</label>
+            <select id="replacement-mode">
+              <option value="Full" selected>Full Replacement</option>
+              <option value="Elitism">Elitism</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Elite Count</label>
+            <input type="number" id="elite-count" value="2" min="1" max="10" disabled>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ADVANCED -->
+      <div class="tab-pane" id="advanced-tab">
+        <div class="form-grid">
+
+          <!-- MAX GENERATIONS -->
+          <div class="row">
+            <label>Maximum Generations</label>
+            <input type="number" id="max-gen" value="1" min="1" max="1000">
+          </div>
+
+          <!-- TARGET FITNESS -->
+          <div class="row">
+            <label>Apply Target Fitness</label>
+            <select id="target-toggle">
+              <option value="false" selected>false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Target Fitness</label>
+            <input type="number" id="target-value" value="10" step="0.01" disabled>
+          </div>
+
+          <!-- CONVERGENCE -->
+          <div class="row">
+            <label>Apply Convergence</label>
+            <select id="conv-toggle">
+              <option value="false" selected>false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Convergence Tolerance</label>
+            <input type="number" id="conv-tolerance" value="0.000001" step="0.000001" disabled>
+          </div>
+
+          <div class="row">
+            <label>Convergence Patience</label>
+            <input type="number" id="conv-patience" value="10" disabled>
+          </div>
+
+          <!-- DIVERSITY -->
+          <div class="row">
+            <label>Apply Diversity Check</label>
+            <select id="div-toggle">
+              <option value="false" selected>false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label>Diversity Threshold</label>
+            <input type="number" id="div-threshold" value="0.3" step="0.01" disabled>
+          </div>
+
+          <div class="row">
+            <label>Diversity Patience</label>
+            <input type="number" id="div-patience" value="3" disabled>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="ok-btn">Ok</button>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div id="generate-popup" class="popup">
+  <div class="popup-content">
+    <div class="form-grid">
+
+      <div class="row">
+        <label>Seed</label>
+
+        <div class="input-with-icon">
+          <input type="number" id="gen-seed" value="123456789">
+          <button id="seed-randomize">&#8635;</button>
+        </div>
+      </div>
+
+      <div class="popup-actions">
+        <button id="gen-ok">Generate</button>
+        <button id="gen-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="plotViewer.js" defer></script>
+<script src="script.js" defer></script>
+</body>
+</html>
