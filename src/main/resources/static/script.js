@@ -1557,7 +1557,7 @@ function renderKnapsackChart(container, data) {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Values & Weights",
+            text: "Weights & Values",
             padding: { right : 10 }
           },
           grid: { color: "#eee" }
