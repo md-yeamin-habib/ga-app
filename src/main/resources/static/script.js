@@ -1528,7 +1528,7 @@ function renderKnapsackChart(container, data) {
     },
 
     options: {
-      layout: {padding : 10}
+      layout: {padding : 10},
       responsive: true,
       maintainAspectRatio: false,
 
