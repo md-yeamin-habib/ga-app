@@ -1528,6 +1528,7 @@ function renderKnapsackChart(container, data) {
     },
 
     options: {
+      layout: {padding : 10}
       responsive: true,
       maintainAspectRatio: false,
 
@@ -1546,7 +1547,8 @@ function renderKnapsackChart(container, data) {
         x: {
           title: {
             display: true,
-            text: "Items"
+            text: "Items",
+            padding: {top: 10}
           },
           grid: { display: false }
         },
@@ -1555,7 +1557,8 @@ function renderKnapsackChart(container, data) {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Values & Weights"
+            text: "Weights & Values",
+            padding: {right: 10}
           },
           grid: { color: "#eee" }
         }
@@ -1625,7 +1628,7 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
     }]},
 
     options: {
-      layout: {padding = 10},
+      layout: {padding : 10},
       responsive: true,
       maintainAspectRatio: false,
 
