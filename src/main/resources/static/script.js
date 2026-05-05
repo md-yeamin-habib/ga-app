@@ -1333,7 +1333,159 @@ function extractRankData(gen) {
   return { labels, values };
 }
 
+function extractPopulationComparison(before, after) {
+
+  const b = Array.isArray(before) ? before : [];
+  const a = Array.isArray(after) ? after : [];
+
+  const labels = [];
+  const values = [];
+  const colors = [];
+  const groupIndex = []; // 0 = before, 1 = after
+
+  const colorMap = {
+    offspring: "rgba(244, 163, 0, 0.7)",   // orange
+    mutated: "rgba(44, 160, 44, 0.7)",     // green
+    elite: "rgba(31, 119, 180, 0.9)",      // deeper blue
+    default: "rgba(31, 119, 180, 0.5)"     // initial population
+  };
+
+  function pushGroup(arr, typeDefault, groupId) {
+    for (const ind of arr) {
+
+      labels.push(ind.name ?? "X");
+      values.push(ind.fitness ?? 0);
+
+      let type = null;
+
+      if (groupId === 1) {
+        type = ind.type ?? typeDefault;
+      }
+      else {
+        type = typeDefault;
+      }
+      colors.push(colorMap[type] || colorMap.default);
+      groupIndex.push(groupId);
+    }
+  }
+
+  pushGroup(b, "default", 0);
+  pushGroup(a, "offspring", 1);
+
+  return { labels, values, colors, groupIndex };
+}
+
+function drawOverlay(ctx, chart, nodes, bestRoute, area) {
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  const xScale = chart.scales.x;
+  const yScale = chart.scales.y;
+
+  const toX = (x) => xScale.getPixelForValue(x);
+  const toY = (y) => yScale.getPixelForValue(y);
+
+  // ==========================
+  // 1. COMPLETE GRAPH (GRAY EDGES)
+  // ==========================
+  ctx.strokeStyle = "#ccc";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+
+      ctx.beginPath();
+      ctx.moveTo(toX(nodes[i].x), toY(nodes[i].y));
+      ctx.lineTo(toX(nodes[j].x), toY(nodes[j].y));
+      ctx.stroke();
+    }
+  }
+
+  // ==========================
+  // 2. BEST ROUTE (RED + ARROWS)
+  // ==========================
+  if (bestRoute && bestRoute.length > 1) {
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
+
+    for (let i = 0; i < bestRoute.length - 1; i++) {
+
+      const a = nodes[bestRoute[i]];
+      const b = nodes[bestRoute[i + 1]];
+
+      const x1 = toX(a.x);
+      const y1 = toY(a.y);
+      const x2 = toX(b.x);
+      const y2 = toY(b.y);
+
+      // line
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      drawArrow(ctx, x1, y1, x2, y2);
+    }
+  }
+
+  if (bestRoute?.length > 2) {
+
+    const a = nodes[bestRoute[bestRoute.length - 1]];
+    const b = nodes[bestRoute[0]];
+
+    ctx.beginPath();
+    ctx.moveTo(toX(a.x), toY(a.y));
+    ctx.lineTo(toX(b.x), toY(b.y));
+    ctx.stroke();
+
+    drawArrow(ctx,
+      toX(a.x), toY(a.y),
+      toX(b.x), toY(b.y)
+    );
+  }
+}
+
+function drawArrow(ctx, x1, y1, x2, y2) {
+
+  const headlen = 8;
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+
+  ctx.fillStyle = "red";
+
+  ctx.beginPath();
+  ctx.moveTo(x2, y2);
+  ctx.lineTo(
+    x2 - headlen * Math.cos(angle - Math.PI / 6),
+    y2 - headlen * Math.sin(angle - Math.PI / 6)
+  );
+  ctx.lineTo(
+    x2 - headlen * Math.cos(angle + Math.PI / 6),
+    y2 - headlen * Math.sin(angle + Math.PI / 6)
+  );
+  ctx.closePath();
+  ctx.fill();
+}
+
+function parseRoute(route) {
+  if (!route) return null;
+
+  if (Array.isArray(route)) return route;
+
+  if (typeof route === "string") {
+    return route
+      .replace(/\s+/g, "")
+      .split("-")
+      .map(Number)
+      .filter(Number.isFinite);
+  }
+
+  return null;
+}
+
 let _chartInstance = null;
+Chart.defaults.font.family = "Arial";
+Chart.defaults.font.size = 12;
 
 function renderKnapsackChart(container, data) {
 
@@ -1392,11 +1544,19 @@ function renderKnapsackChart(container, data) {
 
       scales: {
         x: {
+          title: {
+            display: true,
+            text: "Items"
+          },
           grid: { display: false }
         },
 
         y: {
           beginAtZero: true,
+          title: {
+            display: true,
+            text: "Values & Weights"
+          },
           grid: { color: "#eee" }
         }
       }
@@ -1490,12 +1650,20 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
           type: "linear",
           min: minCoord,
           max: maxCoord,
+          title: {
+            display: true,
+            text: "X-Coordinates"
+          },
           grid: { color: "#eee" }
         },
         y: {
           type: "linear",
           min: minCoord,
           max: maxCoord,
+          title: {
+            display: true,
+            text: "Y-Coordinates"
+          },
           grid: { color: "#eee" }
         }
       },
@@ -1524,115 +1692,6 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
       chartArea
     );
   });
-}
-
-function drawOverlay(ctx, chart, nodes, bestRoute, area) {
-
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-  const xScale = chart.scales.x;
-  const yScale = chart.scales.y;
-
-  const toX = (x) => xScale.getPixelForValue(x);
-  const toY = (y) => yScale.getPixelForValue(y);
-
-  // ==========================
-  // 1. COMPLETE GRAPH (GRAY EDGES)
-  // ==========================
-  ctx.strokeStyle = "#ccc";
-  ctx.lineWidth = 1;
-
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-
-      ctx.beginPath();
-      ctx.moveTo(toX(nodes[i].x), toY(nodes[i].y));
-      ctx.lineTo(toX(nodes[j].x), toY(nodes[j].y));
-      ctx.stroke();
-    }
-  }
-
-  // ==========================
-  // 2. BEST ROUTE (RED + ARROWS)
-  // ==========================
-  if (bestRoute && bestRoute.length > 1) {
-
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 2;
-
-    for (let i = 0; i < bestRoute.length - 1; i++) {
-
-      const a = nodes[bestRoute[i]];
-      const b = nodes[bestRoute[i + 1]];
-
-      const x1 = toX(a.x);
-      const y1 = toY(a.y);
-      const x2 = toX(b.x);
-      const y2 = toY(b.y);
-
-      // line
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-
-      drawArrow(ctx, x1, y1, x2, y2);
-    }
-  }
-
-  // optional: close cycle visually
-  if (bestRoute?.length > 2) {
-
-    const a = nodes[bestRoute[bestRoute.length - 1]];
-    const b = nodes[bestRoute[0]];
-
-    ctx.beginPath();
-    ctx.moveTo(toX(a.x), toY(a.y));
-    ctx.lineTo(toX(b.x), toY(b.y));
-    ctx.stroke();
-
-    drawArrow(ctx,
-      toX(a.x), toY(a.y),
-      toX(b.x), toY(b.y)
-    );
-  }
-}
-
-function drawArrow(ctx, x1, y1, x2, y2) {
-
-  const headlen = 8;
-  const angle = Math.atan2(y2 - y1, x2 - x1);
-
-  ctx.fillStyle = "red";
-
-  ctx.beginPath();
-  ctx.moveTo(x2, y2);
-  ctx.lineTo(
-    x2 - headlen * Math.cos(angle - Math.PI / 6),
-    y2 - headlen * Math.sin(angle - Math.PI / 6)
-  );
-  ctx.lineTo(
-    x2 - headlen * Math.cos(angle + Math.PI / 6),
-    y2 - headlen * Math.sin(angle + Math.PI / 6)
-  );
-  ctx.closePath();
-  ctx.fill();
-}
-
-function parseRoute(route) {
-  if (!route) return null;
-
-  if (Array.isArray(route)) return route;
-
-  if (typeof route === "string") {
-    return route
-      .replace(/\s+/g, "")
-      .split("-")
-      .map(Number)
-      .filter(Number.isFinite);
-  }
-
-  return null;
 }
 
 function renderFitnessChart(container, data, targetFitness = null) {
@@ -1743,11 +1802,19 @@ function renderFitnessChart(container, data, targetFitness = null) {
 
       scales: {
         x: {
+          title: {
+            display: true,
+            text: "Generations"
+          },
           grid: { display: false }
         },
 
         y: {
           beginAtZero: false,
+          title: {
+            display: true,
+            text: "Fitness Score"
+          },
           grid: {
             color: "#eee"
           }
@@ -1875,48 +1942,6 @@ function renderRankChart(container, data) {
   });
 
   canvas._chartInstance = chart;
-}
-
-function extractPopulationComparison(before, after) {
-
-  const b = Array.isArray(before) ? before : [];
-  const a = Array.isArray(after) ? after : [];
-
-  const labels = [];
-  const values = [];
-  const colors = [];
-  const groupIndex = []; // 0 = before, 1 = after
-
-  const colorMap = {
-    offspring: "rgba(244, 163, 0, 0.7)",   // orange
-    mutated: "rgba(44, 160, 44, 0.7)",     // green
-    elite: "rgba(31, 119, 180, 0.9)",      // deeper blue
-    default: "rgba(31, 119, 180, 0.5)"     // initial population
-  };
-
-  function pushGroup(arr, typeDefault, groupId) {
-    for (const ind of arr) {
-
-      labels.push(ind.name ?? "X");
-      values.push(ind.fitness ?? 0);
-
-      let type = null;
-
-      if (groupId === 1) {
-        type = ind.type ?? typeDefault;
-      }
-      else {
-        type = typeDefault;
-      }
-      colors.push(colorMap[type] || colorMap.default);
-      groupIndex.push(groupId);
-    }
-  }
-
-  pushGroup(b, "default", 0);
-  pushGroup(a, "offspring", 1);
-
-  return { labels, values, colors, groupIndex };
 }
 
 function renderPopulationComparisonChart(container, data, targetFitness = null) {
@@ -2095,11 +2120,19 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
 
       scales: {
         x: {
+          title: {
+            display: true,
+            text: "Individuals"
+          },
           grid: { display: false }
         },
 
         y: {
           beginAtZero: false,
+          title: {
+            display: true,
+            text: "Fitness Score"
+          },
           grid: { color: "#eee" }
         }
       }
