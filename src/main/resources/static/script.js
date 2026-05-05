@@ -1528,7 +1528,7 @@ function renderKnapsackChart(container, data) {
     },
 
     options: {
-      layout: {padding : 10},
+      layout: { padding : 10 },
       responsive: true,
       maintainAspectRatio: false,
 
@@ -1548,7 +1548,7 @@ function renderKnapsackChart(container, data) {
           title: {
             display: true,
             text: "Items",
-            padding: {top: 10}
+            padding: {top : 10}
           },
           grid: { display: false }
         },
@@ -1557,8 +1557,8 @@ function renderKnapsackChart(container, data) {
           beginAtZero: true,
           title: {
             display: true,
-            text: "Weights & Values",
-            padding: {right: 10}
+            text: "Values & Weights",
+            padding: { right : 10 }
           },
           grid: { color: "#eee" }
         }
@@ -1810,7 +1810,8 @@ function renderFitnessChart(container, data, targetFitness = null) {
         x: {
           title: {
             display: true,
-            text: "Generations"
+            text: "Generations",
+            padding: { top : 10 }
           },
           grid: { display: false }
         },
@@ -1819,7 +1820,8 @@ function renderFitnessChart(container, data, targetFitness = null) {
           beginAtZero: false,
           title: {
             display: true,
-            text: "Fitness Score"
+            text: "Fitness Score",
+            padding: {right : 10}
           },
           grid: {
             color: "#eee"
@@ -2053,6 +2055,7 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
     },
 
     options: {
+      layout : { padding : 20 },
       responsive: true,
       maintainAspectRatio: false,
 
@@ -2128,7 +2131,8 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
         x: {
           title: {
             display: true,
-            text: "Individuals"
+            text: "Individuals",
+            padding : { top : 10 }
           },
           grid: { display: false }
         },
@@ -2137,7 +2141,8 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
           beginAtZero: false,
           title: {
             display: true,
-            text: "Fitness Score"
+            text: "Fitness Score",
+            padding : { right : 10 }
           },
           grid: { color: "#eee" }
         }
