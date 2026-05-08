@@ -61,6 +61,267 @@ window.onclick = (e) => {
   }
 };
 
+function setupIndexTooltips() {
+  const crossoverInput = document.getElementById("crossover-indices");
+  const mutationInput = document.getElementById("mutation-indices");
+  const crossoverTooltip = document.getElementById("crossover-tooltip");
+  const mutationTooltip = document.getElementById("mutation-tooltip");
+  const crossoverMode = document.getElementById("crossover-mode");
+  const mutationMode = document.getElementById("mutation-mode");
+
+  // ==========================
+  // HELPERS
+  // ==========================
+  function getLength() {
+    return parseInt(
+      document.getElementById("length-input")?.value || 1
+    );
+  }
+
+  function getCrossoverHint() {
+    const n = getLength();
+    const mode = crossoverMode.value;
+
+    if (mode === "One_Point") {
+      return `Allowed: 1 ≤ i ≤ ${n - 1}`;
+    }
+
+    return `Allowed: 0 ≤ i < j ≤ ${n - 1}`;
+  }
+
+  function getMutationHint() {
+
+    const n = getLength();
+
+    const mode = mutationMode.value;
+
+    if (
+      mode === "Bit_Flip" ||
+      mode === "Random_Reset"
+    ) {
+      return `Allowed: 0 ≤ i ≤ ${n - 1}`;
+    }
+
+    return `Allowed: 0 ≤ i < j ≤ ${n - 1}`;
+  }
+
+  // ==========================
+  // VALIDATION
+  // ==========================
+  function validate(value, type) {
+
+    const n = getLength();
+
+    value = value.trim();
+
+    if (
+      value === "" ||
+      value.toLowerCase() === "random"
+    ) {
+      return { valid: true };
+    }
+
+    const nums = value
+      .split(",")
+      .map(v => parseInt(v.trim()))
+      .filter(v => !isNaN(v));
+
+    // --------------------------
+    // SINGLE INDEX
+    // --------------------------
+    if (type === "single") {
+
+      if (nums.length !== 1) {
+        return {
+          valid: false,
+          error: "Exactly one index required"
+        };
+      }
+
+      const i = nums[0];
+
+      if (i < 0 || i >= n) {
+        return {
+          valid: false,
+          error: `Index must be between 0 and ${n - 1}`
+        };
+      }
+
+      return { valid: true };
+    }
+
+    // --------------------------
+    // ONE POINT
+    // --------------------------
+    if (type === "onepoint") {
+
+      if (nums.length !== 1) {
+        return {
+          valid: false,
+          error: "Exactly one crossover point required"
+        };
+      }
+
+      const i = nums[0];
+
+      if (i < 1 || i >= n) {
+        return {
+          valid: false,
+          error: `Index must be between 1 and ${n - 1}`
+        };
+      }
+
+      return { valid: true };
+    }
+
+    // --------------------------
+    // DOUBLE INDEX
+    // --------------------------
+    if (nums.length !== 2) {
+      return {
+        valid: false,
+        error: "Two indices required"
+      };
+    }
+
+    const [i, j] = nums;
+
+    if (
+      i < 0 || j < 0 ||
+      i >= n || j >= n
+    ) {
+      return {
+        valid: false,
+        error: `Indices must be between 0 and ${n - 1}`
+      };
+    }
+
+    if (i >= j) {
+      return {
+        valid: false,
+        error: "Require i < j"
+      };
+    }
+
+    return { valid: true };
+  }
+
+  // ==========================
+  // TOOLTIP CONTROL
+  // ==========================
+  function attachTooltip(
+    input,
+    tooltip,
+    hintGetter,
+    validatorGetter
+  ) {
+
+    input.addEventListener("focus", () => {
+
+      tooltip.textContent = hintGetter();
+
+      tooltip.classList.add("show");
+    });
+
+    input.addEventListener("blur", () => {
+
+      tooltip.classList.remove("show");
+      tooltip.classList.remove("error");
+
+      input.classList.remove("input-invalid");
+    });
+
+    input.addEventListener("input", () => {
+
+      const result =
+        validate(input.value, validatorGetter());
+
+      tooltip.classList.add("show");
+
+      if (!result.valid) {
+
+        tooltip.textContent = result.error;
+
+        tooltip.classList.add("error");
+
+        input.classList.add("input-invalid");
+      }
+
+      else {
+
+        tooltip.textContent = hintGetter();
+
+        tooltip.classList.remove("error");
+
+        input.classList.remove("input-invalid");
+      }
+    });
+  }
+
+  // ==========================
+  // CROSSOVER
+  // ==========================
+  attachTooltip(
+    crossoverInput,
+    crossoverTooltip,
+
+    () => getCrossoverHint(),
+
+    () => {
+
+      const mode = crossoverMode.value;
+
+      if (mode === "One_Point") {
+        return "onepoint";
+      }
+
+      return "double";
+    }
+  );
+
+  // ==========================
+  // MUTATION
+  // ==========================
+  attachTooltip(
+    mutationInput,
+    mutationTooltip,
+
+    () => getMutationHint(),
+
+    () => {
+
+      const mode = mutationMode.value;
+
+      if (
+        mode === "Bit_Flip" ||
+        mode === "Random_Reset"
+      ) {
+        return "single";
+      }
+
+      return "double";
+    }
+  );
+
+  // ==========================
+  // LIVE OPERATOR CHANGES
+  // ==========================
+  crossoverMode.addEventListener("change", () => {
+
+    if (document.activeElement === crossoverInput) {
+      crossoverTooltip.textContent =
+        getCrossoverHint();
+    }
+  });
+
+  mutationMode.addEventListener("change", () => {
+
+    if (document.activeElement === mutationInput) {
+      mutationTooltip.textContent =
+        getMutationHint();
+    }
+  });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -525,6 +786,7 @@ function setupOperatorLogic() {
   replacement.onchange();
   updateCrossover();
   updateMutation();
+  setupIndexTooltips();
 }
 
 // ==========================
