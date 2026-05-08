@@ -804,6 +804,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateProblemTypeFromFilter();
   renderTable();
   updateRunButtonState();
+  updateGenButtons();
   updateSummary();
   updatePlots();
 });
@@ -1208,6 +1209,7 @@ runBtn.onclick = async () => {
     activeTab = "0";
     buildTabs(1);
     renderTable();
+    updateGenButtons();
     updateSummary();
     updatePlots();
 
