@@ -18,8 +18,6 @@ const state = {
 let defaultConfig = {};
 let savedConfig = {};
 
-let selectedRows = new Set();
-
 // ==========================
 // ELEMENTS
 // ==========================
@@ -139,10 +137,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       state.tables["0"] = data.problem || data.population || [];
 
-      activeTab = "0";
+      resetGenerationState();
       renderTable();
-      clearSummary();
-      clearPlots();
       updateRunButtonState();
 
     } catch (err) {
@@ -152,6 +148,20 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
 });
+
+function resetGenerationState() {
+  state.generations = [];
+  currentGen = 1;
+  totalGenerations = 1;
+  activeTab = "0";
+
+  rebuildGenerationDropdown(1);
+  updateGenButtons();
+  buildTabs(1);
+  renderTable();
+  clearSummary();
+  clearPlots();
+}
 
 // ==========================
 // FILTER POPUP
@@ -562,6 +572,17 @@ const dropdown = document.getElementById("generation-dropdown");
 
 function setGeneration(val) {
 
+  const hasRunData =
+    Array.isArray(state.generations) &&
+    state.generations.length > 0;
+
+  // block generation switching if GA not run
+  if (!hasRunData) {
+    currentGen = 1;
+    genSelect.value = 1;
+    return;
+  }
+
   const max = totalGenerations;
 
   currentGen = Math.max(1, Math.min(val, max));
@@ -574,7 +595,6 @@ function setGeneration(val) {
   updateSummary();
   updatePlots();
 }
-
 function syncGenUI() {
 
   dropdown.style.display = "none";
@@ -651,10 +671,22 @@ nextBtn.onclick = () => setGeneration(currentGen + 1);
 lastBtn.onclick = () => setGeneration(totalGenerations);
 
 function updateGenButtons() {
+
+  const hasRunData =
+    Array.isArray(state.generations) &&
+    state.generations.length > 0;
+
   const max = totalGenerations;
 
-  nextBtn.disabled = currentGen >= max;
-  lastBtn.disabled = currentGen >= max;
+  // disable if no GA run exists
+  nextBtn.disabled =
+    !hasRunData || currentGen >= max;
+
+  lastBtn.disabled =
+    !hasRunData || currentGen >= max;
+
+  // also disable manual typing
+  genSelect.disabled = !hasRunData;
 }
 
 // ==========================
@@ -1050,20 +1082,14 @@ function exportCSV() {
 // CLEAR ALL (FIXED)
 // ==========================
 function clearAll() {
-  selectedRows.clear();
-
   state.tables = { "0": [] };
 
-  activeTab = "0";
-  currentGen = 1;
+  resetGenerationState();
 
-  // Clear UI
   tableHead.innerHTML = "";
   tableBody.innerHTML = "";
 
   renderTable();
-  clearSummary();
-  clearPlots();
   updateRunButtonState();
 }
 
