@@ -142,7 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
       activeTab = "0";
       renderTable();
       updateRunButtonState();
-      updateSummary();
+      clearSummary();
+      clearPlots();
+      updateGenButtons();
 
     } catch (err) {
       console.error(err);
