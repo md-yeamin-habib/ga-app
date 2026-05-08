@@ -140,11 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       state.tables["0"] = data.problem || data.population || [];
 
       activeTab = "0";
-      renderTable();
-      updateRunButtonState();
-      clearSummary();
-      clearPlots();
-      updateGenButtons();
+      clearAll();
 
     } catch (err) {
       console.error(err);
@@ -1065,6 +1061,7 @@ function clearAll() {
   renderTable();
   clearSummary();
   clearPlots();
+  updateGenButtons();
   updateRunButtonState();
 }
 
