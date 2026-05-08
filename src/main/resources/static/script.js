@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       activeTab = "0";
       clearAll();
+      renderTable();
 
     } catch (err) {
       console.error(err);
