@@ -295,7 +295,7 @@ tr:nth-child(even) {
   cursor: pointer;
   user-select: none;
 
-  opacity: 0.05;
+  opacity: 0.25;
   z-index: 9999;
 }
 
