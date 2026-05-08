@@ -1061,8 +1061,8 @@ function clearAll() {
   tableBody.innerHTML = "";
 
   renderTable();
-  updateSummary();
-  updatePlots();
+  clearSummary();
+  clearPlots();
   updateRunButtonState();
 }
 
@@ -2270,6 +2270,36 @@ function updatePlots() {
   });
 
   PlotViewer.setPlots(plots);
+}
+
+function clearPlots() {
+
+  const PlotViewer = window.PlotViewer;
+
+  if (!PlotViewer || !PlotViewer.setPlots) {
+    console.error("PlotViewer not ready");
+    return;
+  }
+
+  // Show a default empty plot
+  PlotViewer.setPlots([
+    {
+      title: "Fitness Over Generations",
+
+      render: (container) => {
+
+        renderFitnessChart(
+          container,
+          {
+            labels: [],
+            bestFitness: [],
+            avgFitness: []
+          },
+          null
+        );
+      }
+    }
+  ]);
 }
 
 function clearSummary() {
