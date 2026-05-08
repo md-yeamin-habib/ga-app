@@ -143,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTable();
       clearSummary();
       clearPlots();
-      updateGenButtons();
       updateRunButtonState();
 
     } catch (err) {
@@ -1065,7 +1064,6 @@ function clearAll() {
   renderTable();
   clearSummary();
   clearPlots();
-  updateGenButtons();
   updateRunButtonState();
 }
 
