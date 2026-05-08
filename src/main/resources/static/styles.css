@@ -778,3 +778,9 @@ tr:nth-child(even) {
 .input-tooltip.error {
   background: #b42318;
 }
+
+.input-invalid {
+  border-color: #b42318 !important;
+}
+
+
