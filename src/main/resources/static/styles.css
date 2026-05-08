@@ -730,3 +730,51 @@ tr:nth-child(even) {
 .dropdown-list::-webkit-scrollbar-thumb:hover {
   background: #aaa;
 }
+
+.tooltip-field {
+  position: relative;
+  width: 100%;
+}
+
+.input-tooltip {
+
+  position: absolute;
+
+  top: 105%;
+  left: 0;
+
+  min-width: 220px;
+
+  padding: 8px 10px;
+
+  background: #222;
+  color: white;
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  border-radius: 6px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transform: translateY(-4px);
+
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+
+  z-index: 999;
+}
+
+.input-tooltip.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.input-tooltip.error {
+  background: #b42318;
+}
