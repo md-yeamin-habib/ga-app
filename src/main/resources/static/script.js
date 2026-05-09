@@ -396,7 +396,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      state.tables["0"] = data.problem || data.population || [];
+      state.tables = {
+        "0": data.problem || data.population || []
+      };
 
       resetGenerationState();
       renderTable();
@@ -421,7 +423,6 @@ function resetGenerationState() {
   rebuildGenerationDropdown(1);
   updateGenButtons();
   buildTabs(1);
-  renderTable();
   clearSummary();
   clearPlots();
 }
