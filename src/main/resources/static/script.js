@@ -396,11 +396,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      state.tables = {
-        "0": data.problem || data.population || []
-      };
-
-      resetGenerationState();
+      clearAll();
+      
+      state.tables["0"] = data.problem || data.population || [];
+      
       renderTable();
       updateRunButtonState();
 
