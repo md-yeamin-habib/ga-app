@@ -1663,6 +1663,10 @@ function extractPopulationComparison(before, after) {
   return { labels, values, colors, groupIndex };
 }
 
+let _chartInstance = null;
+Chart.defaults.font.family = "Arial";
+Chart.defaults.font.size = 12;
+
 function drawOverlay(ctx, chart, nodes, bestRoute, area) {
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -1707,7 +1711,7 @@ function drawOverlay(ctx, chart, nodes, bestRoute, area) {
       const x2 = toX(b.x);
       const y2 = toY(b.y);
 
-      // line
+      // route line
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
@@ -1717,20 +1721,23 @@ function drawOverlay(ctx, chart, nodes, bestRoute, area) {
     }
   }
 
+  // close cycle
   if (bestRoute?.length > 2) {
 
     const a = nodes[bestRoute[bestRoute.length - 1]];
     const b = nodes[bestRoute[0]];
 
+    const x1 = toX(a.x);
+    const y1 = toY(a.y);
+    const x2 = toX(b.x);
+    const y2 = toY(b.y);
+
     ctx.beginPath();
-    ctx.moveTo(toX(a.x), toY(a.y));
-    ctx.lineTo(toX(b.x), toY(b.y));
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
     ctx.stroke();
 
-    drawArrow(ctx,
-      toX(a.x), toY(a.y),
-      toX(b.x), toY(b.y)
-    );
+    drawArrow(ctx, x1, y1, x2, y2);
   }
 }
 
@@ -1743,24 +1750,29 @@ function drawArrow(ctx, x1, y1, x2, y2) {
 
   ctx.beginPath();
   ctx.moveTo(x2, y2);
+
   ctx.lineTo(
     x2 - headlen * Math.cos(angle - Math.PI / 6),
     y2 - headlen * Math.sin(angle - Math.PI / 6)
   );
+
   ctx.lineTo(
     x2 - headlen * Math.cos(angle + Math.PI / 6),
     y2 - headlen * Math.sin(angle + Math.PI / 6)
   );
+
   ctx.closePath();
   ctx.fill();
 }
 
 function parseRoute(route) {
+
   if (!route) return null;
 
   if (Array.isArray(route)) return route;
 
   if (typeof route === "string") {
+
     return route
       .replace(/\s+/g, "")
       .split("-")
@@ -1784,7 +1796,8 @@ function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
     0,
     Math.min(
       1,
-      ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)
+      ((px - x1) * dx + (py - y1) * dy) /
+      (dx * dx + dy * dy)
     )
   );
 
@@ -1794,9 +1807,288 @@ function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
   return Math.hypot(px - projX, py - projY);
 }
 
-let _chartInstance = null;
-Chart.defaults.font.family = "Arial";
-Chart.defaults.font.size = 12;
+function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, index = 1) {
+  container.innerHTML = `
+    <div id="tsp-wrapper"
+         style="
+           position:relative;
+           width:100%;
+           height:100%;
+           min-height:320px;
+         ">
+
+      <canvas id="tsp-base"></canvas>
+
+      <canvas id="tsp-overlay"
+        style="
+          position:absolute;
+          top:0;
+          left:0;
+          z-index:10;
+        ">
+      </canvas>
+
+      <div id="tsp-tooltip"
+           style="
+             position:absolute;
+             display:none;
+             background:#222;
+             color:white;
+             padding:6px 10px;
+             border-radius:6px;
+             font-size:12px;
+             pointer-events:none;
+             z-index:999;
+             white-space:nowrap;
+             box-shadow:0 2px 8px rgba(0,0,0,0.3);
+           ">
+      </div>
+
+    </div>
+  `;
+
+  const baseCanvas = container.querySelector("#tsp-base");
+  const overlayCanvas = container.querySelector("#tsp-overlay");
+  const tooltip = container.querySelector("#tsp-tooltip");
+
+  const ctxOverlay = overlayCanvas.getContext("2d");
+
+  // destroy previous chart
+  if (baseCanvas._chartInstance) {
+    baseCanvas._chartInstance.destroy();
+  }
+
+  const nodes = data.labels.map((label, i) => ({
+    name: label,
+    x: data.x[i],
+    y: data.y[i]
+  }));
+
+  const startIndex = bestRoute?.[0] ?? 0;
+
+  const cityData = nodes
+    .map((n) => ({
+      name: n.name,
+      x: n.x,
+      y: n.y
+    }))
+    .filter((_, i) => i !== startIndex);
+
+  // ==========================
+  // CHART
+  // ==========================
+  const chart = new Chart(baseCanvas, {
+
+    type: "scatter",
+
+    data: {
+
+      datasets: [
+
+        {
+          label: "Cities",
+          data: cityData,
+          backgroundColor: "#1f77b4",
+          pointRadius: 5,
+          pointStyle: "circle"
+        },
+
+        {
+          label: "Start City",
+          data: [nodes[startIndex]],
+          backgroundColor: "#000",
+          pointRadius: 8,
+          pointStyle: "triangle"
+        },
+
+        {
+          label: "Best Path",
+          data: [],
+          borderColor: "red",
+          backgroundColor: "red",
+          showLine: true,
+          pointRadius: 0,
+          borderWidth: 3
+        }
+      ]
+    },
+
+    options: {
+
+      layout: {
+        padding: 10
+      },
+
+      responsive: true,
+      maintainAspectRatio: false,
+
+      plugins: {
+
+        legend: {
+          display: true
+        },
+
+        title: {
+          display: true,
+          text: `TSP: Best Route (Generation ${index})`
+        },
+
+        tooltip: {
+
+          callbacks: {
+
+            label: (ctx) => {
+
+              const d = ctx.raw;
+
+              return `${d.name} (${d.x}, ${d.y})`;
+            }
+          }
+        }
+      },
+
+      scales: {
+
+        x: {
+          type: "linear",
+          min: minCoord,
+          max: maxCoord,
+
+          title: {
+            display: true,
+            text: "X-Coordinates",
+            padding: { top: 10 }
+          },
+
+          grid: {
+            color: "#eee"
+          }
+        },
+
+        y: {
+          type: "linear",
+          min: minCoord,
+          max: maxCoord,
+
+          title: {
+            display: true,
+            text: "Y-Coordinates",
+            padding: { right: 10 }
+          },
+
+          grid: {
+            color: "#eee"
+          }
+        }
+      },
+
+      animation: false
+    }
+  });
+
+  baseCanvas._chartInstance = chart;
+
+  const xScale = chart.scales.x;
+  const yScale = chart.scales.y;
+
+  // ==========================
+  // DRAW OVERLAY
+  // ==========================
+  requestAnimationFrame(() => {
+
+    overlayCanvas.width = baseCanvas.width;
+    overlayCanvas.height = baseCanvas.height;
+
+    drawOverlay(
+      ctxOverlay,
+      chart,
+      nodes,
+      bestRoute,
+      chart.chartArea
+    );
+  });
+
+  // ==========================
+  // TOOLTIP HOVER
+  // ==========================
+  overlayCanvas.addEventListener("mousemove", (e) => {
+
+    if (!bestRoute || bestRoute.length < 2) {
+      tooltip.style.display = "none";
+      return;
+    }
+
+    const rect = overlayCanvas.getBoundingClientRect();
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    let hovering = false;
+
+    const toX = (x) => xScale.getPixelForValue(x);
+    const toY = (y) => yScale.getPixelForValue(y);
+
+    // normal route segments
+    for (let i = 0; i < bestRoute.length - 1; i++) {
+
+      const a = nodes[bestRoute[i]];
+      const b = nodes[bestRoute[i + 1]];
+
+      const dist = pointToSegmentDistance(
+        mouseX,
+        mouseY,
+        toX(a.x),
+        toY(a.y),
+        toX(b.x),
+        toY(b.y)
+      );
+
+      if (dist < 8) {
+        hovering = true;
+        break;
+      }
+    }
+
+    // closing edge
+    if (!hovering && bestRoute.length > 2) {
+
+      const a = nodes[bestRoute[bestRoute.length - 1]];
+      const b = nodes[bestRoute[0]];
+
+      const dist = pointToSegmentDistance(
+        mouseX,
+        mouseY,
+        toX(a.x),
+        toY(a.y),
+        toX(b.x),
+        toY(b.y)
+      );
+
+      if (dist < 8) {
+        hovering = true;
+      }
+    }
+
+    if (hovering) {
+
+      tooltip.style.display = "block";
+
+      tooltip.textContent =
+        `Best Path (${bestRoute.join(" → ")})`;
+
+      tooltip.style.left = `${mouseX + 12}px`;
+      tooltip.style.top = `${mouseY + 12}px`;
+
+    } else {
+
+      tooltip.style.display = "none";
+    }
+  });
+
+  overlayCanvas.addEventListener("mouseleave", () => {
+    tooltip.style.display = "none";
+  });
+}
 
 function renderKnapsackChart(container, data) {
 
@@ -1878,207 +2170,6 @@ function renderKnapsackChart(container, data) {
   });
 
   canvas._chartInstance = chart;
-}
-
-function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, index = 1) {
-
-  container.innerHTML = `
-    <div style="position:relative; width:100%; height:100%; min-height:320px;">
-      <canvas id="tsp-base"></canvas>
-      <canvas id="tsp-overlay"
-        style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
-    </div>
-  `;
-
-  const baseCanvas = container.querySelector("#tsp-base");
-  const overlayCanvas = container.querySelector("#tsp-overlay");
-
-  const startIndex = bestRoute?.[0] ?? 0;
-
-  const ctxOverlay = overlayCanvas.getContext("2d");
-
-  // destroy old chart if exists
-  if (baseCanvas._chartInstance) {
-    baseCanvas._chartInstance.destroy();
-  }
-
-  const nodes = data.labels.map((label, i) => ({
-    name: label,
-    x: data.x[i],
-    y: data.y[i]
-  }));
-
-  const cityData = nodes
-  .map((n, i) => ({
-    name: n.name,
-    x: n.x,
-    y: n.y
-  }))
-  .filter((_, i) => i !== startIndex);
-
-  // ==========================
-  // CHART.JS NODE LAYER
-  // ==========================
-  const chart = new Chart(baseCanvas, {
-    type: "scatter",
-    data: {
-      datasets: [{
-        label: "Cities",
-        data: cityData,
-        backgroundColor: "#1f77b4",
-        pointRadius: 5,
-        pointStyle: "circle"
-      },
-      {
-        label: "Start City",
-        data: [nodes[startIndex]],
-        backgroundColor: "#000",
-        pointRadius: 8,
-        pointStyle: "triangle"
-      },
-      {
-        label: "Best Path",
-        data: [],
-        borderColor: "red",
-        backgroundColor: "red",
-        showLine: true,
-        pointRadius: 0,
-        borderWidth: 3
-      }
-    ]},
-
-    options: {
-      layout: {padding : 10},
-      responsive: true,
-      maintainAspectRatio: false,
-
-      plugins: {
-        legend: { display: true },
-        title: {
-          display: true,
-          text: `TSP: Best Route (Generation ${index})`
-        },
-
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const d = ctx.raw;
-              return `${d.name} (${d.x}, ${d.y})`;
-            }
-          }
-        }
-      },
-
-      scales: {
-        x: {
-          type: "linear",
-          min: minCoord,
-          max: maxCoord,
-          title: {
-            display: true,
-            text: "X-Coordinates",
-            padding: {top: 10}
-          },
-          grid: { color: "#eee" }
-        },
-        y: {
-          type: "linear",
-          min: minCoord,
-          max: maxCoord,
-          title: {
-            display: true,
-            text: "Y-Coordinates",
-            padding: {right: 10}
-          },
-          grid: { color: "#eee" }
-        }
-      },
-
-      animation: false
-    }
-  });
-
-  baseCanvas._chartInstance = chart;
-
-  // ==========================
-  // WAIT FOR LAYOUT READY
-  // ==========================
-  requestAnimationFrame(() => {
-
-    const chartArea = chart.chartArea;
-
-    overlayCanvas.width = baseCanvas.width;
-    overlayCanvas.height = baseCanvas.height;
-
-    drawOverlay(
-      ctxOverlay,
-      chart,
-      nodes,
-      bestRoute,
-      chartArea
-    );
-
-    const bestPathText = bestRoute
-      ? `Best Path (${bestRoute.join(" → ")})`
-      : "";
-
-    overlayCanvas.addEventListener("mousemove", (e) => {
-
-      if (!bestRoute || bestRoute.length < 2) return;
-
-      const rect = overlayCanvas.getBoundingClientRect();
-
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-
-      let hovering = false;
-
-      for (let i = 0; i < bestRoute.length - 1; i++) {
-
-        const from = nodes[bestRoute[i]];
-        const to = nodes[bestRoute[i + 1]];
-
-        const p1 = chart.getDatasetMeta(
-          from.name == nodes[startIndex].name ? 1 : 0
-        ).data[
-          from.name == nodes[startIndex].name
-            ? 0
-            : cityData.findIndex(c => c.name === from.name)
-        ];
-
-        const p2 = chart.getDatasetMeta(
-          to.name == nodes[startIndex].name ? 1 : 0
-        ).data[
-          to.name == nodes[startIndex].name
-            ? 0
-            : cityData.findIndex(c => c.name === to.name)
-        ];
-
-        if (!p1 || !p2) continue;
-
-        const x1 = p1.x;
-        const y1 = p1.y;
-        const x2 = p2.x;
-        const y2 = p2.y;
-
-        const dist = pointToSegmentDistance(
-          mouseX,
-          mouseY,
-          x1,
-          y1,
-          x2,
-          y2
-        );
-
-        if (dist < 8) {
-          hovering = true;
-          break;
-        }
-      }
-
-      overlayCanvas.title = hovering ? bestPathText : "";
-    });
-  });
 }
 
 function renderFitnessChart(container, data, targetFitness = null) {
