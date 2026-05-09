@@ -21,6 +21,11 @@ public class InversionMutation implements MutationStrategy {
         if (indices.length < 2) {
             start = RandomUtil.nextInt(0, individual.getGenes().size() - 1);
             end = RandomUtil.nextInt(0, individual.getGenes().size() - 1);
+            
+            while (start == end) { 
+                end = RandomUtil.nextInt(0, individual.getGenes().size() - 1);
+            }
+            
         } else {
             start = indices[0];
             end = indices[1];
