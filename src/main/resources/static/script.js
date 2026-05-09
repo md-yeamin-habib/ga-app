@@ -2169,6 +2169,18 @@ function renderFitnessChart(container, data, targetFitness = null) {
         title: {
           display: true,
           text: "Fitness Over Generations"
+        },
+
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              if (ctx.raw == null) return null;
+              const value = Array.isArray(ctx.raw)
+                ? ctx.raw[1]
+                : ctx.raw;
+              return `${ctx.dataset.label}: ${value}`;
+            }
+          }
         }
       },
 
@@ -2500,12 +2512,15 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
           display: true,
           text: "Population Comparison"
         },
-
+        
         tooltip: {
           callbacks: {
             label: (ctx) => {
               if (ctx.raw == null) return null;
-              return `${ctx.label}: ${ctx.raw}`;
+              const value = Array.isArray(ctx.raw)
+                ? ctx.raw[1]
+                : ctx.raw;
+              return `${ctx.dataset.label}: ${value}`;
             }
           }
         }
