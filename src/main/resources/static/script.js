@@ -2130,7 +2130,7 @@ function renderFitnessChart(container, data, targetFitness = null) {
 
   const allValues = [
     ...best.filter(v => v != null),
-  .  ..avg.filter(v => v != null)
+    ...avg.filter(v => v != null)
   ];
 
   if (targetFitness != null) {
