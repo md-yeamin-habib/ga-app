@@ -2140,39 +2140,12 @@ function renderFitnessChart(container, data, targetFitness = null) {
   const dataMin = Math.min(...allValues);
   const dataMax = Math.max(...allValues);
 
-  const range = dataMax - dataMin;
-  const padding = Math.max(range * 0.12, 1);
+  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
+  const padding = range * 0.1;
   
-  let yMin;
-  let yMax;
-
-  if (dataMin < 0 && dataMax > 0) {
-    yMin = dataMin - padding;
-    yMax = dataMax + padding;
-  }
-
-  else if (dataMin >= 0) {
-    const compressionRatio = dataMin / dataMax;
-    
-    if (compressionRatio > 0.7) {
-      yMin = dataMin - padding;
-      if (yMin < 0) yMin = 0;
-    }
-
-    else {
-      yMin = 0;
-    }
-
-    yMax = dataMax + padding;
-  }
-
-  else {
-
-    yMin = dataMin - padding;
-    yMax = dataMax + padding;
-    if (yMax > 0) yMax = 0;
-  }
-
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
+  
   const chart = new Chart(canvas, {
     data: { labels, datasets },
 
@@ -2455,39 +2428,12 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
 
   const dataMin = Math.min(...numericValues);
   const dataMax = Math.max(...numericValues);
-
-  const range = dataMax - dataMin;
-  const padding = Math.max(range * 0.15, 1);
   
-  let yMin;
-  let yMax;
-
-  if (dataMin < 0 && dataMax > 0) {
-    yMin = dataMin - padding;
-    yMax = dataMax + padding;
-  }
-
-  else if (dataMin >= 0) {
-    const compressionRatio = dataMin / dataMax;
-    
-    if (compressionRatio > 0.7) {
-      yMin = dataMin - padding;
-      if (yMin < 0) yMin = 0;
-    }
-
-    else {
-      yMin = 0;
-    }
-
-    yMax = dataMax + padding;
-  }
-
-  else {
-
-    yMin = dataMin - padding;
-    yMax = dataMax + padding;
-    if (yMax > 0) yMax = 0;
-  }
+  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
+  const padding = range * 0.1;
+  
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
 
   const chart = new Chart(canvas, {
     data: {
