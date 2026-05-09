@@ -747,15 +747,22 @@ tr:nth-child(even) {
 
   padding: 8px 10px;
 
-  background: #222;
-  color: white;
+  background: rgba(28, 28, 32, 0.82);
+  color: rgba(255,255,255,0.96);
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(255,255,255,0.08);
 
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 1.45;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.18),
+    0 1px 0 rgba(255,255,255,0.04) inset;
 
   opacity: 0;
   visibility: hidden;
@@ -770,13 +777,14 @@ tr:nth-child(even) {
 }
 
 .input-tooltip.show {
-  opacity: 0.5;
+  opacity: 1;
   visibility: visible;
   transform: translateY(0);
 }
 
 .input-tooltip.error {
-  background: #b42318;
+  background: rgba(180, 35, 24, 0.88);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .input-invalid {
