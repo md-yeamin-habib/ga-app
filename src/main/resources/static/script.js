@@ -415,7 +415,9 @@ function resetGenerationState() {
   currentGen = 1;
   totalGenerations = 1;
   activeTab = "0";
-
+  tableHead.innerHTML = "";
+  tableBody.innerHTML = "";
+  
   rebuildGenerationDropdown(1);
   updateGenButtons();
   buildTabs(1);
@@ -1345,12 +1347,7 @@ function exportCSV() {
 // ==========================
 function clearAll() {
   state.tables = { "0": [] };
-
   resetGenerationState();
-
-  tableHead.innerHTML = "";
-  tableBody.innerHTML = "";
-
   renderTable();
   updateRunButtonState();
 }
