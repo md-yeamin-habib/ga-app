@@ -2082,7 +2082,7 @@ function renderFitnessChart(container, data, targetFitness = null) {
       type: "bar",
       label: "Best Fitness",
       data: best,
-      backgroundColor: "rgba(31, 119, 180, 0.35)", // lighter blue (less dominant)
+      backgroundColor: "rgba(31, 119, 180, 0.35)", // lighter blue
       borderWidth: 0,
       barPercentage: 0.6,
       categoryPercentage: 0.7
@@ -2122,13 +2122,29 @@ function renderFitnessChart(container, data, targetFitness = null) {
       borderColor: "red",
       borderWidth: 2,
       borderDash: [6, 6],
-
-      pointRadius: 0,          // NO nodes
+      pointRadius: 0,
       pointHoverRadius: 0,
-
       fill: false
     });
   }
+
+  const allValues = [
+    ...best.filter(v => v != null),
+  .  ..avg.filter(v => v != null)
+  ];
+
+  if (targetFitness != null) {
+    allValues.push(targetFitness);
+  }
+
+  const dataMin = Math.min(...allValues);
+  const dataMax = Math.max(...allValues);
+
+  const range = dataMax - dataMin;
+  const padding = Math.max(range * 0.12, 1);
+
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
 
   const chart = new Chart(canvas, {
     data: { labels, datasets },
@@ -2172,7 +2188,8 @@ function renderFitnessChart(container, data, targetFitness = null) {
         },
 
         y: {
-          beginAtZero: false,
+          min: yMin,
+          max: yMax,
           title: {
             display: true,
             text: "Fitness Score",
@@ -2403,6 +2420,17 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
     if (color === typeColors.default) presentTypes.add("default");
   }
 
+  const numericValues = adjustedValues.filter(v => v != null);
+
+  const dataMin = Math.min(...numericValues);
+  const dataMax = Math.max(...numericValues);
+
+  const range = dataMax - dataMin;
+  const padding = Math.max(range * 0.15, 1);
+
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
+
   const chart = new Chart(canvas, {
     data: {
       labels: adjustedLabels,
@@ -2493,7 +2521,8 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
         },
 
         y: {
-          beginAtZero: false,
+          min: yMin,
+          max: yMax,
           title: {
             display: true,
             text: "Fitness Score",
