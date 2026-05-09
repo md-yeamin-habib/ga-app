@@ -1771,6 +1771,29 @@ function parseRoute(route) {
   return null;
 }
 
+function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(px - x1, py - y1);
+  }
+
+  const t = Math.max(
+    0,
+    Math.min(
+      1,
+      ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy)
+    )
+  );
+
+  const projX = x1 + t * dx;
+  const projY = y1 + t * dy;
+
+  return Math.hypot(px - projX, py - projY);
+}
+
 let _chartInstance = null;
 Chart.defaults.font.family = "Arial";
 Chart.defaults.font.size = 12;
@@ -1907,13 +1930,22 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
         pointStyle: "circle"
       },
       {
-      label: "Start City",
-      data: [nodes[startIndex]],
-
-      backgroundColor: "#000",
-      pointRadius: 8,
-      pointStyle: "triangle"
-    }]},
+        label: "Start City",
+        data: [nodes[startIndex]],
+        backgroundColor: "#000",
+        pointRadius: 8,
+        pointStyle: "triangle"
+      },
+      {
+        label: "Best Path",
+        data: [],
+        borderColor: "red",
+        backgroundColor: "red",
+        showLine: true,
+        pointRadius: 0,
+        borderWidth: 3
+      }
+    ]},
 
     options: {
       layout: {padding : 10},
@@ -1985,6 +2017,67 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
       bestRoute,
       chartArea
     );
+
+    const bestPathText = bestRoute
+      ? `Best Path (${bestRoute.join(" → ")})`
+      : "";
+
+    overlayCanvas.addEventListener("mousemove", (e) => {
+
+      if (!bestRoute || bestRoute.length < 2) return;
+
+      const rect = overlayCanvas.getBoundingClientRect();
+
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      let hovering = false;
+
+      for (let i = 0; i < bestRoute.length - 1; i++) {
+
+        const from = nodes[bestRoute[i]];
+        const to = nodes[bestRoute[i + 1]];
+
+        const p1 = chart.getDatasetMeta(
+          from.name == nodes[startIndex].name ? 1 : 0
+        ).data[
+          from.name == nodes[startIndex].name
+            ? 0
+            : cityData.findIndex(c => c.name === from.name)
+        ];
+
+        const p2 = chart.getDatasetMeta(
+          to.name == nodes[startIndex].name ? 1 : 0
+        ).data[
+          to.name == nodes[startIndex].name
+            ? 0
+            : cityData.findIndex(c => c.name === to.name)
+        ];
+
+        if (!p1 || !p2) continue;
+
+        const x1 = p1.x;
+        const y1 = p1.y;
+        const x2 = p2.x;
+        const y2 = p2.y;
+
+        const dist = pointToSegmentDistance(
+          mouseX,
+          mouseY,
+          x1,
+          y1,
+          x2,
+          y2
+        );
+
+        if (dist < 8) {
+          hovering = true;
+          break;
+        }
+      }
+
+      overlayCanvas.title = hovering ? bestPathText : "";
+    });
   });
 }
 
