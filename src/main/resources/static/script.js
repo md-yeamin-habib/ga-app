@@ -1783,39 +1783,14 @@ function parseRoute(route) {
   return null;
 }
 
-function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
-
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-
-  if (dx === 0 && dy === 0) {
-    return Math.hypot(px - x1, py - y1);
-  }
-
-  const t = Math.max(
-    0,
-    Math.min(
-      1,
-      ((px - x1) * dx + (py - y1) * dy) /
-      (dx * dx + dy * dy)
-    )
-  );
-
-  const projX = x1 + t * dx;
-  const projY = y1 + t * dy;
-
-  return Math.hypot(px - projX, py - projY);
-}
-
 function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, index = 1) {
   container.innerHTML = `
-    <div id="tsp-wrapper"
-         style="
-           position:relative;
-           width:100%;
-           height:100%;
-           min-height:320px;
-         ">
+    <div style="
+      position:relative;
+      width:100%;
+      height:100%;
+      min-height:320px;
+    ">
 
       <canvas id="tsp-base"></canvas>
 
@@ -1824,32 +1799,16 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
           position:absolute;
           top:0;
           left:0;
+          pointer-events:none;
           z-index:10;
         ">
       </canvas>
-
-      <div id="tsp-tooltip"
-           style="
-             position:absolute;
-             display:none;
-             background:#222;
-             color:white;
-             padding:6px 10px;
-             border-radius:6px;
-             font-size:12px;
-             pointer-events:none;
-             z-index:999;
-             white-space:nowrap;
-             box-shadow:0 2px 8px rgba(0,0,0,0.3);
-           ">
-      </div>
 
     </div>
   `;
 
   const baseCanvas = container.querySelector("#tsp-base");
   const overlayCanvas = container.querySelector("#tsp-overlay");
-  const tooltip = container.querySelector("#tsp-tooltip");
 
   const ctxOverlay = overlayCanvas.getContext("2d");
 
@@ -1873,6 +1832,14 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
       y: n.y
     }))
     .filter((_, i) => i !== startIndex);
+
+  const range = maxCoord - minCoord;
+
+  // dynamic padding
+  const padding = Math.max(range * 0.08, 0.5);
+
+  const graphMin = minCoord - padding;
+  const graphMax = maxCoord + padding;
 
   // ==========================
   // CHART
@@ -1951,8 +1918,8 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
 
         x: {
           type: "linear",
-          min: minCoord,
-          max: maxCoord,
+          min: graphMin,
+          max: graphMax,
 
           title: {
             display: true,
@@ -1988,9 +1955,6 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
 
   baseCanvas._chartInstance = chart;
 
-  const xScale = chart.scales.x;
-  const yScale = chart.scales.y;
-
   // ==========================
   // DRAW OVERLAY
   // ==========================
@@ -2006,87 +1970,6 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
       bestRoute,
       chart.chartArea
     );
-  });
-
-  // ==========================
-  // TOOLTIP HOVER
-  // ==========================
-  overlayCanvas.addEventListener("mousemove", (e) => {
-
-    if (!bestRoute || bestRoute.length < 2) {
-      tooltip.style.display = "none";
-      return;
-    }
-
-    const rect = overlayCanvas.getBoundingClientRect();
-
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    let hovering = false;
-
-    const toX = (x) => xScale.getPixelForValue(x);
-    const toY = (y) => yScale.getPixelForValue(y);
-
-    // normal route segments
-    for (let i = 0; i < bestRoute.length - 1; i++) {
-
-      const a = nodes[bestRoute[i]];
-      const b = nodes[bestRoute[i + 1]];
-
-      const dist = pointToSegmentDistance(
-        mouseX,
-        mouseY,
-        toX(a.x),
-        toY(a.y),
-        toX(b.x),
-        toY(b.y)
-      );
-
-      if (dist < 8) {
-        hovering = true;
-        break;
-      }
-    }
-
-    // closing edge
-    if (!hovering && bestRoute.length > 2) {
-
-      const a = nodes[bestRoute[bestRoute.length - 1]];
-      const b = nodes[bestRoute[0]];
-
-      const dist = pointToSegmentDistance(
-        mouseX,
-        mouseY,
-        toX(a.x),
-        toY(a.y),
-        toX(b.x),
-        toY(b.y)
-      );
-
-      if (dist < 8) {
-        hovering = true;
-      }
-    }
-
-    if (hovering) {
-
-      tooltip.style.display = "block";
-
-      tooltip.textContent =
-        `Best Path (${bestRoute.join(" → ")})`;
-
-      tooltip.style.left = `${mouseX + 12}px`;
-      tooltip.style.top = `${mouseY + 12}px`;
-
-    } else {
-
-      tooltip.style.display = "none";
-    }
-  });
-
-  overlayCanvas.addEventListener("mouseleave", () => {
-    tooltip.style.display = "none";
   });
 }
 
