@@ -743,7 +743,7 @@ tr:nth-child(even) {
   top: 105%;
   left: 0;
 
-  min-width: 220px;
+  min-width: 150px;
 
   padding: 8px 10px;
 
@@ -770,7 +770,7 @@ tr:nth-child(even) {
 }
 
 .input-tooltip.show {
-  opacity: 1;
+  opacity: 0.5;
   visibility: visible;
   transform: translateY(0);
 }
