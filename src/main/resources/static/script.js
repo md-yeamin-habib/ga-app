@@ -2073,6 +2073,24 @@ function renderFitnessChart(container, data, targetFitness = null) {
     canvas._chartInstance.destroy();
   }
 
+  const allValues = [
+    ...best.filter(v => v != null),
+    ...avg.filter(v => v != null)
+  ];
+
+  if (targetFitness != null) {
+    allValues.push(targetFitness);
+  }
+
+  const dataMin = Math.min(...allValues);
+  const dataMax = Math.max(...allValues);
+
+  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
+  const padding = range * 0.1;
+  
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
+
   const datasets = [
 
     // ==========================
@@ -2081,7 +2099,7 @@ function renderFitnessChart(container, data, targetFitness = null) {
     {
       type: "bar",
       label: "Best Fitness",
-      data: best,
+      data: best.map(v => v == null ? null : [yMin, v]),
       backgroundColor: "rgba(31, 119, 180, 0.35)", // lighter blue
       borderWidth: 0,
       barPercentage: 0.6,
@@ -2127,24 +2145,6 @@ function renderFitnessChart(container, data, targetFitness = null) {
       fill: false
     });
   }
-
-  const allValues = [
-    ...best.filter(v => v != null),
-    ...avg.filter(v => v != null)
-  ];
-
-  if (targetFitness != null) {
-    allValues.push(targetFitness);
-  }
-
-  const dataMin = Math.min(...allValues);
-  const dataMax = Math.max(...allValues);
-
-  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
-  const padding = range * 0.1;
-  
-  const yMin = dataMin - padding;
-  const yMax = dataMax + padding;
   
   const chart = new Chart(canvas, {
     data: { labels, datasets },
@@ -2368,16 +2368,28 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
     }
   }
 
+  const numericValues = adjustedValues.filter(v => v != null);
+
+  if (targetFitness != null) {
+    numericValues.push(targetFitness);
+  }
+
+  const dataMin = Math.min(...numericValues);
+  const dataMax = Math.max(...numericValues);
+  
+  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
+  const padding = range * 0.1;
+  
+  const yMin = dataMin - padding;
+  const yMax = dataMax + padding;
+
   const datasets = [
     {
       type: "bar",
       label: "Fitness",
-      data: adjustedValues,
-
+      data: adjustedValues.map(v => v == null ? null : [yMin, v]),
       backgroundColor: adjustedColors,
-
       borderWidth: 0,
-
       barPercentage: 0.9,
       categoryPercentage: 0.9
     }
@@ -2419,21 +2431,6 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
     if (color === typeColors.elite) presentTypes.add("elite");
     if (color === typeColors.default) presentTypes.add("default");
   }
-
-  const numericValues = adjustedValues.filter(v => v != null);
-
-  if (targetFitness != null) {
-    numericValues.push(targetFitness);
-  }
-
-  const dataMin = Math.min(...numericValues);
-  const dataMax = Math.max(...numericValues);
-  
-  const range = Math.max(dataMax - dataMin, Math.abs(dataMax), Math.abs(dataMin), 1e-9);
-  const padding = range * 0.1;
-  
-  const yMin = dataMin - padding;
-  const yMax = dataMax + padding;
 
   const chart = new Chart(canvas, {
     data: {
