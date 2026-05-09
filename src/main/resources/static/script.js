@@ -1934,8 +1934,8 @@ function renderTSPChart(container, data, bestRoute = null, minCoord, maxCoord, i
 
         y: {
           type: "linear",
-          min: minCoord,
-          max: maxCoord,
+          min: graphMin,
+          max: graphMax,
 
           title: {
             display: true,
