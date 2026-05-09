@@ -2142,9 +2142,36 @@ function renderFitnessChart(container, data, targetFitness = null) {
 
   const range = dataMax - dataMin;
   const padding = Math.max(range * 0.12, 1);
+  
+  let yMin;
+  let yMax;
 
-  const yMin = dataMin - padding;
-  const yMax = dataMax + padding;
+  if (dataMin < 0 && dataMax > 0) {
+    yMin = dataMin - padding;
+    yMax = dataMax + padding;
+  }
+
+  else if (dataMin >= 0) {
+    const compressionRatio = dataMin / dataMax;
+    
+    if (compressionRatio > 0.7) {
+      yMin = dataMin - padding;
+      if (yMin < 0) yMin = 0;
+    }
+
+    else {
+      yMin = 0;
+    }
+
+    yMax = dataMax + padding;
+  }
+
+  else {
+
+    yMin = dataMin - padding;
+    yMax = dataMax + padding;
+    if (yMax > 0) yMax = 0;
+  }
 
   const chart = new Chart(canvas, {
     data: { labels, datasets },
@@ -2422,14 +2449,45 @@ function renderPopulationComparisonChart(container, data, targetFitness = null) 
 
   const numericValues = adjustedValues.filter(v => v != null);
 
+  if (targetFitness != null) {
+    numericValues.push(targetFitness);
+  }
+
   const dataMin = Math.min(...numericValues);
   const dataMax = Math.max(...numericValues);
 
   const range = dataMax - dataMin;
   const padding = Math.max(range * 0.15, 1);
+  
+  let yMin;
+  let yMax;
 
-  const yMin = dataMin - padding;
-  const yMax = dataMax + padding;
+  if (dataMin < 0 && dataMax > 0) {
+    yMin = dataMin - padding;
+    yMax = dataMax + padding;
+  }
+
+  else if (dataMin >= 0) {
+    const compressionRatio = dataMin / dataMax;
+    
+    if (compressionRatio > 0.7) {
+      yMin = dataMin - padding;
+      if (yMin < 0) yMin = 0;
+    }
+
+    else {
+      yMin = 0;
+    }
+
+    yMax = dataMax + padding;
+  }
+
+  else {
+
+    yMin = dataMin - padding;
+    yMax = dataMax + padding;
+    if (yMax > 0) yMax = 0;
+  }
 
   const chart = new Chart(canvas, {
     data: {
