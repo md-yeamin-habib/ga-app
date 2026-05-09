@@ -655,8 +655,6 @@ function updateGeneInputs() {
     minGene.disabled = true;
     maxGene.disabled = true;
   } else {
-    minGene.value = 0;
-    maxGene.value = 9;
     minGene.disabled = false;
     maxGene.disabled = false;
   }
