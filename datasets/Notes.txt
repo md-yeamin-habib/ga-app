@@ -1,0 +1,50 @@
+GA Sample Datasets
+==================
+
+1. tsp_dataset.csv
+   - Suggested Goal:
+     Minimize total route distance.
+   - Approximate optimal route:
+     A -> D -> B -> E -> C -> A
+   - Approximate minimum distance:
+     ~26.8
+   - Approximate fitness:
+     ~0.037313
+
+2. knapsack_dataset.csv
+   - Suggested capacity:
+     15
+   - Maximum reachable fitness/value:
+     46
+   - One optimal selection:
+     Item1 + Item2 + Item5 + Item6
+     Total Weight = 15
+     Total Value = 46
+
+3. binary_dataset.csv
+   - Example target fitness:
+     Maximize number of 1s.
+   - Chromosome length:
+     8
+   - Maximum possible fitness:
+     8
+
+4. integer_dataset.csv
+   - Example target fitness:
+     Maximize sum of genes.
+   - Gene range:
+     0 to 9
+   - Chromosome length:
+     6
+   - Maximum possible fitness:
+     54
+
+5. real_dataset.csv
+   - Example target fitness:
+     Maximize sum of genes.
+   - Gene range:
+     approximately 0 to 5
+   - Chromosome length:
+     5
+   - Approximate maximum possible fitness:
+     25
