@@ -1590,7 +1590,7 @@ runBtn.onclick = async () => {
     const formattedTime = elapsed < 1000
         ? `${elapsed.toFixed(2)} ms`
         : `${(elapsed / 1000).toFixed(2)} s`;
-    
+    document.getElementById("evaluation-time").textContent = formattedTime;
   } catch (err) {
     if (err.name === "AbortError") {
       console.log("GA run cancelled");
@@ -1599,7 +1599,6 @@ runBtn.onclick = async () => {
     console.error(err);
     alert("Network error while running GA");
   } finally {
-    document.getElementById("evaluation-time").textContent = formattedTime;
     runBtn.disabled = false;
   }
 };
