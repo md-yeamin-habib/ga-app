@@ -52,20 +52,40 @@ const helpBtn = document.getElementById("help-btn");
 const helpModal = document.getElementById("help-modal");
 const helpClose = document.getElementById("help-close");
 
+const helpSections =
+  document.querySelectorAll(".help-section");
+
 // ==========================
 // GLOBAL CLICK HANDLER
 // ==========================
 window.onclick = (e) => {
-  if (e.target === filterPopup) filterPopup.style.display = "none";
-  if (e.target === customPopup) customPopup.style.display = "none";
+
+  // filter popup
+  if (e.target === filterPopup) {
+    filterPopup.style.display = "none";
+  }
+
+  // custom formula popup
+  if (e.target === customPopup) {
+    customPopup.style.display = "none";
+  }
+
+  // parameter modal
   if (e.target === modal) {
+
     applyConfig(savedConfig);
+
     modal.style.display = "none";
+  }
+
+  // help modal
+  if (e.target === helpModal) {
+    helpModal.style.display = "none";
   }
 };
 
 // ==========================
-// HELP MODAL
+// HELP MODAL OPEN/CLOSE
 // ==========================
 
 helpBtn.onclick = () => {
@@ -76,11 +96,30 @@ helpClose.onclick = () => {
   helpModal.style.display = "none";
 };
 
-window.addEventListener("click", (e) => {
+// ==========================
+// HELP ACCORDION
+// ==========================
 
-  if (e.target === helpModal) {
-    helpModal.style.display = "none";
-  }
+helpSections.forEach(section => {
+
+  const header =
+    section.querySelector(".help-section-header");
+
+  header.onclick = () => {
+
+    const alreadyOpen =
+      section.classList.contains("active");
+
+    // close all
+    helpSections.forEach(s => {
+      s.classList.remove("active");
+    });
+
+    // reopen clicked one if it wasn't open
+    if (!alreadyOpen) {
+      section.classList.add("active");
+    }
+  };
 });
 
 function setupIndexTooltips() {
