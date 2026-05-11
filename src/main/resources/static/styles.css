@@ -266,7 +266,6 @@ tr:nth-child(even) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0; /* IMPORTANT */
 }
 
 /* ==========================
@@ -278,7 +277,6 @@ tr:nth-child(even) {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0; /* IMPORTANT */
 }
 
 .plot-main-wrapper {
@@ -287,7 +285,7 @@ tr:nth-child(even) {
   display: flex;
   align-items: stretch;
   justify-content: center;
-  min-height: 0;
+  cursor: zoom-in;
 }
 
 /* MAIN CONTAINER */
@@ -300,7 +298,6 @@ tr:nth-child(even) {
   justify-content: center;
   background: #eee;
   overflow: hidden;
-  min-height: 0; /* remove forced height */
 }
 
 /* NAV BUTTONS */
@@ -350,7 +347,6 @@ tr:nth-child(even) {
   max-height: 100%;
   object-fit: contain;
   display: block;
-  cursor: zoom-in;
 }
 
 .plot-main img:hover {
@@ -383,7 +379,7 @@ tr:nth-child(even) {
   background: white;
   border-radius: 6px;
   padding: 10px;
-
+  cursor: zoom-out;
   display: flex;
   align-items: center;
   justify-content: center;
