@@ -44,8 +44,8 @@
           </div>
 
           <div class="gen-nav">
-            <button id="to-next-gen" title="Next Generation">▶</button>
-            <button id="to-last-gen" title="Last Generation">▶▶</button>
+            <button id="to-next-gen" title="Next Generation">&#9654;</button>
+            <button id="to-last-gen" title="Last Generation">&#9654;&#9654;</button>
           </div>
         </div>
       </div>
@@ -101,6 +101,18 @@
         <span>Stop Reason</span>
         <strong id="sum-stop">-</strong>
       </div>
+    </div>
+
+    <!-- EVALUATION TIME -->
+    <div class="panel eval-panel">
+
+      <div class="panel-title">Performance</div>
+
+      <div class="summary-row">
+        <span>Evaluation Time</span>
+        <strong id="evaluation-time">--</strong>
+      </div>
+
     </div>
 
     <div class="panel">
@@ -448,7 +460,7 @@
         <div class="help-section-content">
 
           <ol>
-            <li>Choose a Filter / Problem Type.</li>
+            <li>Choose a <b>Filter</b>.</li>
 
             <li>Click <b>Apply</b>.</li>
 
@@ -457,13 +469,11 @@
             </li>
 
             <li>
-              Setup parameters using the
-              <b>Parameters</b> button.
+              Setup parameters using the <b>Parameters</b> button.
             </li>
 
             <li>
-              Click <b>Evaluate</b> to run the
-              Genetic Algorithm.
+              Click <b>Evaluate</b> to run the Genetic Algorithm.
             </li>
 
             <li>
@@ -494,8 +504,7 @@
                 <li>Min / Max Gene</li>
               </ul>
 
-              then you should reload or regenerate
-              the input data before evaluating again.
+              then you should reload or regenerate the input data before evaluating again.
             </li>
 
             <li>
@@ -505,8 +514,7 @@
                 <li>The formula format is invalid</li>
                 <li>Unsupported symbols/functions are used</li>
                 <li>
-                  The formula can cause divide-by-zero
-                  errors
+                  The formula can cause divide-by-zero errors
                 </li>
               </ul>
             </li>
@@ -551,8 +559,7 @@
           </ul>
 
           <p>
-            Chromosomes must also be properly formatted
-            and valid for the selected encoding type.
+            Chromosomes must also be properly formatted and valid for the selected encoding type.
           </p>
 
           <ul>
