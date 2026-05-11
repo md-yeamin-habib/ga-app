@@ -165,80 +165,149 @@ tr:nth-child(even) {
 /* ==========================
    SIDEBAR
    ========================== */
+
 .sidebar {
+
   flex: 1;
-  padding: 10px 20px;        
+
+  padding: 10px 20px;
+
   display: flex;
   flex-direction: column;
   gap: 10px;
 
   height: 100%;
-  overflow: hidden;         
+  overflow: hidden;
 }
 
+/* ==========================
+   PANELS
+   ========================== */
+
 .panel {
+
   border: 1px solid #d6d6d6;
+
   background: #fafafa;
+
   padding: 10px 12px;
+
   border-radius: 4px;
+
   width: 100%;
-  box-sizing: border-box;     
+  box-sizing: border-box;
 }
 
 .panel-title {
+
   font-weight: 600;
-  font-size: 13px;  
+  font-size: 13px;
+
   margin-bottom: 8px;
-  border-bottom: 1px solid #ddd;   
+
+  border-bottom: 1px solid #ddd;
+
   padding-bottom: 4px;
+
   color: #333;
 }
 
+/* ==========================
+   SUMMARY / PERFORMANCE ROWS
+   ========================== */
+
 .summary-row {
+
   display: flex;
+
   justify-content: space-between;
+
+  align-items: center;
+
   margin: 4px 0;
+
   font-size: 13px;
 }
 
 .summary-row span {
-  color: #666;                    
+  color: #666;
 }
 
 .summary-row strong {
+
   font-weight: 600;
-  color: #111;                      
+
+  color: #111;
 }
 
 .summary-divider {
+
   margin: 10px 0;
+
   border-top: 1px dashed #ddd;
 }
 
+/* ==========================
+   PERFORMANCE PANEL
+   ========================== */
+
+.eval-panel {
+
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#evaluation-time {
+
+  font-weight: 600;
+
+  color: #222;
+
+  letter-spacing: 0.2px;
+}
+
+/* ==========================
+   GENERATION DISPLAY
+   ========================== */
+
 .gen-current {
+
   color: #000;
+
   font-weight: 600;
 }
 
 .gen-separator {
+
   color: #888;
+
   font-weight: normal;
 }
 
+/* ==========================
+   PLOTS
+   ========================== */
+
 .plot-panel {
+
   flex: 1;
+
   display: flex;
   flex-direction: column;
-  overflow: hidden; 
+
+  overflow: hidden;
+
   min-height: 360px;
 }
 
 .plot-box {
+
   flex: 1;
+
   background: #f0f0f0;
+
   border: 1px solid #ddd;
 }
-
 /* ==========================
    PLOT VIEWER
    ========================== */
