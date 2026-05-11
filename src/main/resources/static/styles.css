@@ -360,7 +360,7 @@ tr:nth-child(even) {
   inset: 0;
   background: rgba(0,0,0,0.85);
   z-index: 20000;
-
+  cursor: zoom-out;
   align-items: center;
   justify-content: center;
 }
@@ -379,7 +379,7 @@ tr:nth-child(even) {
   background: white;
   border-radius: 6px;
   padding: 10px;
-  cursor: zoom-out;
+
   display: flex;
   align-items: center;
   justify-content: center;
