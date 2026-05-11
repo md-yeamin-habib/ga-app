@@ -48,6 +48,7 @@ const exportBtn = document.getElementById("export-btn");
 const clearBtn = document.getElementById("clear-btn");
 
 const runBtn = document.getElementById("run-btn");
+const helpBtn = document.getElementById("help-btn");
 
 // ==========================
 // GLOBAL CLICK HANDLER
