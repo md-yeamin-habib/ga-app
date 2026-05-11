@@ -797,11 +797,16 @@ HELP BUTTON
 
 .help-btn {
 
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
 
-  border-radius: 50%;
+  min-width: 32px;
+  min-height: 32px;
+
+  padding: 0;
+
   border: none;
+  border-radius: 50%;
 
   background: #1976d2;
   color: white;
@@ -809,14 +814,23 @@ HELP BUTTON
   font-size: 18px;
   font-weight: bold;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   cursor: pointer;
 
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+
+  flex-shrink: 0;
 }
 
 .help-btn:hover {
+
   background: #1565c0;
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 /* ==========================
@@ -828,17 +842,15 @@ HELP MODAL
   display: none;
 
   position: fixed;
-  z-index: 3000;
+  z-index: 9999;
 
-  left: 0;
-  top: 0;
+  inset: 0;
 
-  width: 100%;
-  height: 100%;
-
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
 
   overflow-y: auto;
+
+  padding: 40px 20px;
 }
 
 /* ==========================
@@ -847,16 +859,17 @@ MODAL CONTENT
 
 .help-content {
 
-  background: white;
+  width: min(700px, 100%);
+  margin: auto;
 
-  width: min(800px, 92%);
-  margin: 60px auto;
+  background: white;
 
   border-radius: 14px;
 
   overflow: hidden;
 
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.22);
 
   animation: helpFade 0.2s ease;
 }
@@ -881,8 +894,8 @@ HEADER
 .help-header {
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   padding: 16px 22px;
 
@@ -891,20 +904,25 @@ HEADER
 }
 
 .help-header h2 {
+
   margin: 0;
+
   font-size: 22px;
+  font-weight: 600;
 }
 
 #help-close {
 
   font-size: 30px;
+  line-height: 1;
+
   cursor: pointer;
 
-  line-height: 1;
+  transition: opacity 0.2s ease;
 }
 
 #help-close:hover {
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 /* ==========================
@@ -913,27 +931,101 @@ BODY
 
 .help-body {
 
-  padding: 24px;
+  padding: 20px;
 
   color: #333;
+
   line-height: 1.6;
 }
 
-.help-body h3 {
+/* ==========================
+ACCORDION SECTION
+========================== */
+
+.help-section {
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  margin-bottom: 14px;
+
+  background: white;
+}
+
+/* ==========================
+SECTION HEADER
+========================== */
+
+.help-section-header {
+
+  width: 100%;
+
+  border: none;
+
+  background: #f5f7fb;
+
+  padding: 14px 18px;
+
+  text-align: left;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  color: #222;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.help-section-header:hover {
+  background: #e9eef8;
+}
+
+/* ==========================
+SECTION CONTENT
+========================== */
+
+.help-section-content {
+
+  display: none;
+
+  padding: 18px;
+
+  background: white;
+
+  border-top: 1px solid #eee;
+}
+
+.help-section.active .help-section-content {
+  display: block;
+}
+
+/* ==========================
+TEXT STYLING
+========================== */
+
+.help-section-content p {
 
   margin-top: 0;
-  color: #1976d2;
 }
 
-.help-body section {
-  margin-bottom: 28px;
+.help-section-content ul,
+.help-section-content ol {
+
+  padding-left: 22px;
+  margin: 10px 0;
 }
 
-.help-body ul,
-.help-body ol {
-  padding-left: 24px;
-}
+.help-section-content li {
 
-.help-body li {
   margin-bottom: 8px;
+}
+
+.help-section-content ul ul,
+.help-section-content ol ol {
+
+  margin-top: 8px;
 }
