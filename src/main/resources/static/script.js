@@ -49,6 +49,8 @@ const clearBtn = document.getElementById("clear-btn");
 
 const runBtn = document.getElementById("run-btn");
 const helpBtn = document.getElementById("help-btn");
+const helpModal = document.getElementById("help-modal");
+const helpClose = document.getElementById("help-close");
 
 // ==========================
 // GLOBAL CLICK HANDLER
@@ -61,6 +63,25 @@ window.onclick = (e) => {
     modal.style.display = "none";
   }
 };
+
+// ==========================
+// HELP MODAL
+// ==========================
+
+helpBtn.onclick = () => {
+  helpModal.style.display = "block";
+};
+
+helpClose.onclick = () => {
+  helpModal.style.display = "none";
+};
+
+window.addEventListener("click", (e) => {
+
+  if (e.target === helpModal) {
+    helpModal.style.display = "none";
+  }
+});
 
 function setupIndexTooltips() {
   const crossoverInput = document.getElementById("crossover-indices");
