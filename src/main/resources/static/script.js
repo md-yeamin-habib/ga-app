@@ -1531,6 +1531,9 @@ runBtn.onclick = async () => {
   // START TIMER
   // ==========================
   runBtn.disabled = true;
+  document.getElementById("evaluation-time").textContent = "-";
+  clearSummary();
+  clearPlots();
   const startTime = performance.now();
   const payload = buildGARequest();
   payload.tables = state.tables || { "0": [] };
@@ -1561,13 +1564,9 @@ runBtn.onclick = async () => {
       const errText = await res.text();
       console.error("Backend Error:", errText);
       alert("Run failed: check console for backend error");
-
       return;
     }
 
-    document.getElementById("evaluation-time").textContent = "-";
-    clearSummary();
-    clearPlots();
     const data = await res.json();
     state.generations = data.generations;
     const lastGen = data.generations[data.generations.length - 1];
