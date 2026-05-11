@@ -841,20 +841,10 @@ HELP BUTTON
   display: flex;
   align-items: center;
   justify-content: center;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
-
-  flex-shrink: 0;
 }
 
 .help-btn:hover {
-
   background: #1565c0;
-  transform: scale(1.05);
 }
 
 /* ==========================
