@@ -1406,6 +1406,7 @@ function exportCSV() {
 // ==========================
 function clearAll() {
   state.tables = { "0": [] };
+  document.getElementById("evaluation-time").textContent = "--";
   resetGenerationState();
   renderTable();
   updateRunButtonState();
@@ -1516,7 +1517,11 @@ function updateRunButtonState() {
 
 runBtn.onclick = async () => {
 
-  const payload = buildGARequest(); 
+  // ==========================
+  // START TIMER
+  // ==========================
+  const startTime = performance.now();
+  const payload = buildGARequest();
   payload.tables = state.tables || { "0": [] };
 
   // safety cleanup (prevents Spring 400)
@@ -1531,7 +1536,9 @@ runBtn.onclick = async () => {
   try {
     const res = await fetch("/api/ga/run", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(payload)
     });
 
@@ -1539,17 +1546,16 @@ runBtn.onclick = async () => {
       const errText = await res.text();
       console.error("Backend Error:", errText);
       alert("Run failed: check console for backend error");
+
       return;
     }
 
     const data = await res.json();
-
     state.generations = data.generations;
     const lastGen = data.generations[data.generations.length - 1];
 
     rebuildGenerationDropdown(lastGen.generation);
-    loadRunResults(data); 
-
+    loadRunResults(data);
     currentGen = 1;
     activeTab = "0";
     buildTabs(1);
@@ -1557,6 +1563,17 @@ runBtn.onclick = async () => {
     updateGenButtons();
     updateSummary();
     updatePlots();
+
+    // ==========================
+    // END TIMER
+    // ==========================
+    const endTime = performance.now();
+    const elapsed = endTime - startTime;
+    const formattedTime = elapsed < 1000
+        ? `${elapsed.toFixed(2)} ms`
+        : `${(elapsed / 1000).toFixed(2)} s`;
+
+    document.getElementById("evaluation-time").textContent = formattedTime;
 
   } catch (err) {
     console.error(err);
