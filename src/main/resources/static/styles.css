@@ -217,15 +217,10 @@ tr:nth-child(even) {
    ========================== */
 
 .summary-row {
-
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
   margin: 4px 0;
-
   font-size: 13px;
 }
 
@@ -234,16 +229,12 @@ tr:nth-child(even) {
 }
 
 .summary-row strong {
-
   font-weight: 600;
-
   color: #111;
 }
 
 .summary-divider {
-
   margin: 10px 0;
-
   border-top: 1px dashed #ddd;
 }
 
@@ -252,17 +243,13 @@ tr:nth-child(even) {
    ========================== */
 
 .eval-panel {
-
   padding-top: 8px;
   padding-bottom: 8px;
 }
 
 #evaluation-time {
-
   font-weight: 600;
-
   color: #222;
-
   letter-spacing: 0.2px;
 }
 
@@ -271,16 +258,12 @@ tr:nth-child(even) {
    ========================== */
 
 .gen-current {
-
   color: #000;
-
   font-weight: 600;
 }
 
 .gen-separator {
-
   color: #888;
-
   font-weight: normal;
 }
 
@@ -289,23 +272,16 @@ tr:nth-child(even) {
    ========================== */
 
 .plot-panel {
-
   flex: 1;
-
   display: flex;
   flex-direction: column;
-
   overflow: hidden;
-
   min-height: 360px;
 }
 
 .plot-box {
-
   flex: 1;
-
   background: #f0f0f0;
-
   border: 1px solid #ddd;
 }
 /* ==========================
@@ -331,7 +307,7 @@ tr:nth-child(even) {
 .plot-main {
   position: relative;
   flex: 1;
-  min-height: 330px;
+  min-height: 360px;
   width: 100%;
 
   display: flex;
