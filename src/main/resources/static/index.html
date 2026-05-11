@@ -15,7 +15,7 @@
   <button id="run-btn">Evaluate</button>
   <button id="export-btn">Save</button>
   <button id="clear-btn">Clear</button>
-  <button id="help-btn">Help</button>
+  <button id="help-btn" class="help-btn">?</button>
 </div>
 
 <!-- FILTER ROW -->
@@ -423,6 +423,88 @@
         <button id="gen-ok">Generate</button>
         <button id="gen-cancel">Cancel</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="help-modal" class="help-modal">
+
+  <div class="help-content">
+
+    <div class="help-header">
+      <h2>Application Help</h2>
+      <span id="help-close">&times;</span>
+    </div>
+
+    <div class="help-body">
+
+      <section>
+        <h3>General Workflow</h3>
+
+        <ol>
+          <li>Choose a Filter.</li>
+          <li>Click <b>Apply</b>.</li>
+          <li>Load or Generate data using the respective buttons.</li>
+          <li>Setup parameters using the <b>Parameters</b> button.</li>
+          <li>Click <b>Evaluate</b> to run the Genetic Algorithm.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h3>Important Notes</h3>
+
+        <ul>
+
+          <li>
+            If you change:
+            <ul>
+              <li>Problem Type</li>
+              <li>Chromosome Length</li>
+              <li>Population Size</li>
+              <li>Min / Max Gene</li>
+            </ul>
+
+            then you should reload or regenerate the input data before evaluating again.
+          </li>
+
+          <li>
+            Custom Fitness Functions may fail if:
+            <ul>
+              <li>No formula is provided</li>
+              <li>The formula format is invalid</li>
+              <li>Unsupported symbols/functions are used</li>
+              <li>The formula can cause divide-by-zero errors</li>
+            </ul>
+          </li>
+
+        </ul>
+      </section>
+
+      <section>
+        <h3>CSV Import Instructions</h3>
+
+        <p>Imported files must be in <b>.csv</b> format.</p>
+
+        <p>Required columns for each problem:</p>
+
+        <ul>
+          <li><b>TSP:</b> City, X-Coordinate, Y-Coordinate</li>
+          <li><b>Knapsack:</b> Item, Value, Weight</li>
+          <li><b>General Problems:</b> Individual, Chromosome</li>
+        </ul>
+
+        <p>
+          Chromosomes must also be properly formatted and valid for the selected encoding type.
+        </p>
+
+        <ul>
+          <li>Binary: only 0 and 1</li>
+          <li>Integer: valid integer genes</li>
+          <li>Real: valid decimal values</li>
+        </ul>
+
+      </section>
+
     </div>
   </div>
 </div>
