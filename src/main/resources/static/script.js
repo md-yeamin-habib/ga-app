@@ -17,6 +17,7 @@ const state = {
 
 let defaultConfig = {};
 let savedConfig = {};
+let currentRunController = null;
 
 // ==========================
 // ELEMENTS
@@ -447,6 +448,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const req = buildGARequest();
 
     try {
+      if (currentRunController) {
+        currentRunController.abort();
+        currentRunController = null;
+      }
+      
       const res = await fetch("/api/ga/generate", {
         method: "POST",
         headers: {
@@ -1405,8 +1411,12 @@ function exportCSV() {
 // CLEAR ALL (FIXED)
 // ==========================
 function clearAll() {
+  if (currentRunController) {
+    currentRunController.abort();
+    currentRunController = null;
+  }
   state.tables = { "0": [] };
-  document.getElementById("evaluation-time").textContent = "--";
+  document.getElementById("evaluation-time").textContent = "-";
   resetGenerationState();
   renderTable();
   updateRunButtonState();
@@ -1520,6 +1530,7 @@ runBtn.onclick = async () => {
   // ==========================
   // START TIMER
   // ==========================
+  runBtn.disabled = true;
   const startTime = performance.now();
   const payload = buildGARequest();
   payload.tables = state.tables || { "0": [] };
@@ -1534,12 +1545,16 @@ runBtn.onclick = async () => {
   }
 
   try {
+    const controller = new AbortController();
+    currentRunController = controller;
+    
     const res = await fetch("/api/ga/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
 
     if (!res.ok) {
@@ -1576,8 +1591,14 @@ runBtn.onclick = async () => {
     document.getElementById("evaluation-time").textContent = formattedTime;
 
   } catch (err) {
+    if (err.name === "AbortError") {
+      console.log("GA run cancelled");
+      return;
+    }
     console.error(err);
     alert("Network error while running GA");
+  } finally {
+    runBtn.disabled = false;
   }
 };
 
