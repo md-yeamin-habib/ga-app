@@ -1553,7 +1553,7 @@ runBtn.onclick = async () => {
     const data = await res.json();
     state.generations = data.generations;
     const lastGen = data.generations[data.generations.length - 1];
-
+    console.log("Run ended at generation " + lastGen.generation + " due to " + lastGen.stopCriteria); 
     rebuildGenerationDropdown(lastGen.generation);
     loadRunResults(data);
     currentGen = 1;
